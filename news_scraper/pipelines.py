@@ -6,8 +6,24 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+from scrapy.exceptions import DropItem
 
 
 class NewsScraperPipeline:
     def process_item(self, item, spider):
         return item
+
+
+class DeduplicationPipeline:
+    def __init__(self):
+        self.urls_seen = set()
+    
+    def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
+
+        if adapter['url'] in self.urls_seen:
+            raise DropItem(f'Duplicate item found: {item}')
+
+        else:
+            self.urls_seen.add(adapter['url'])
+            return item
