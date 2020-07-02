@@ -13,6 +13,17 @@ services:
             NEWS_NET_KAFKA_HOSTS: "kafka-server1:9092"
         depends_on: 
             - kafka-server1
+    
+    news_scheduler-server:
+        build: 
+            context: .
+            dockerfile: ./conf/NewsScheduler.Dockerfile
+        networks:
+            - news_scraper-net
+        environment:
+            NEWS_NET_KAFKA_HOSTS: "kafka-server1:9092"
+        depends_on: 
+            - kafka-server1
 
     kafdrop:
         image: 'obsidiandynamics/kafdrop'
