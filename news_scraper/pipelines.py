@@ -49,8 +49,8 @@ class KafkaPipeline:
     
     @classmethod
     def from_settings(cls, settings):
-        k_hosts = settings.get('SCRAPY_KAFKA_HOSTS', ['localhost:9092'])
-        topic = settings.get('SCRAPY_KAFKA_ITEM_PIPELINE_TOPIC', 'scrapy_kafka_item')
+        k_hosts = settings.get('KAFKA_HOSTS', ['localhost:9092'])
+        topic = settings.get('KAFKA_ITEM_PIPELINE_TOPIC', 'scrapy_kafka_item')
 
         prod = KafkaProducer(bootstrap_servers=k_hosts)
         return cls(prod, topic)

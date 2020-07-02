@@ -93,7 +93,8 @@ ITEM_PIPELINES = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # scrapy-kafka settings
-SCRAPY_KAFKA_HOSTS = os.getenv('SCRAPY_KAFKA_HOSTS', ['localhost:9092'])
+KAFKA_HOSTS = os.getenv('NEWS_NET_KAFKA_HOSTS', ['localhost:9092'])
+KAFKA_ITEM_PIPELINE_TOPIC = 'articles-queue'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'example (+http://www.yourdomain.com)'

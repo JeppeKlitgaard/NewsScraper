@@ -10,7 +10,7 @@ services:
         networks:
             - news_scraper-net
         environment:
-            SCRAPY_KAFKA_HOSTS: "kafka-server1:9092"
+            NEWS_NET_KAFKA_HOSTS: "kafka-server1:9092"
         depends_on: 
             - kafka-server1
 
