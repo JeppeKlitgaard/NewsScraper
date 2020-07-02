@@ -1,3 +1,5 @@
+import os 
+
 # Scrapy settings for news_scraper project
 #
 # For simplicity, this file contains only settings considered important or
@@ -18,6 +20,7 @@ USER_AGENT = 'news_scraper (+https://github.com/dkkline/NewsScraper)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -65,6 +68,7 @@ ROBOTSTXT_OBEY = True
 ITEM_PIPELINES = {
    'news_scraper.pipelines.NewsScraperPipeline': 300,
    'news_scraper.pipelines.DeduplicationPipeline': 500,
+   'news_scraper.pipelines.KafkaPipeline': 700,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -87,3 +91,9 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# scrapy-kafka settings
+SCRAPY_KAFKA_HOSTS = os.getenv('SCRAPY_KAFKA_HOSTS', ['localhost:9092'])
+
+# Crawl responsibly by identifying yourself (and your website) on the user-agent
+# USER_AGENT = 'example (+http://www.yourdomain.com)'

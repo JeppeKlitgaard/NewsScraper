@@ -23,6 +23,8 @@ class BBCNewsSpider(scrapy.Spider):
             _a['crawl_datetime'] = datetime.datetime.now()
             _a['source'] = self.name
 
+            self.log("TEST!!!")
+
             yield _a
 
         

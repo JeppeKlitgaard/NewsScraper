@@ -7,6 +7,9 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
+from scrapy.utils.serialize import ScrapyJSONEncoder
+
+from kafka import KafkaProducer
 
 
 class NewsScraperPipeline:
@@ -27,3 +30,27 @@ class DeduplicationPipeline:
         else:
             self.urls_seen.add(adapter['url'])
             return item
+
+class KafkaPipeline:
+    # https://github.com/dfdeshom/scrapy-kafka/blob/master/scrapy_kafka/pipelines.py
+    def __init__(self, producer, topic):
+        self.producer = producer
+        self.topic = topic
+
+        self.encoder = ScrapyJSONEncoder()
+    
+    def process_item(self, item, spider):
+        item = dict(item)
+        item['spider'] = spider.name
+        msg = self.encoder.encode(item)
+        spider.log(msg)
+        self.producer.send(self.topic, msg.encode('utf-8'))
+        spider.log("Sent to kafka.")
+    
+    @classmethod
+    def from_settings(cls, settings):
+        k_hosts = settings.get('SCRAPY_KAFKA_HOSTS', ['localhost:9092'])
+        topic = settings.get('SCRAPY_KAFKA_ITEM_PIPELINE_TOPIC', 'scrapy_kafka_item')
+
+        prod = KafkaProducer(bootstrap_servers=k_hosts)
+        return cls(prod, topic)
