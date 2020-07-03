@@ -1,3 +1,4 @@
 scrapy
 itemadapter
 kafka-python
+afkak

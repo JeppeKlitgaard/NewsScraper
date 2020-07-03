@@ -37,7 +37,7 @@ class KafkaScraper(object):
         self.producer = KafkaProducer(bootstrap_servers=self.bootstrap_servers,
                                       value_serializer=value_serializer
                                       )
-    
+
     def run_loop(self):
         for message in self.consumer:
             try:
@@ -53,5 +53,4 @@ class KafkaScraper(object):
             print(deferred)
             deferred.addCallback(lambda x: print(x))
             deferred.addErrback(lambda x: print(x))
-
-
+            reactor.run()

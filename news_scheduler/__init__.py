@@ -4,11 +4,13 @@ Contains Kafka Producer that publishes sites to crawl to a Kafka topic in a sche
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
-from .utils import list_spiders_available, _default_value_serializer
 from news_scraper.utils import make_spider_dict, json_serializer
 
 import time
 import itertools
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class NewsScheduler(object):
@@ -22,6 +24,7 @@ class NewsScheduler(object):
         self.producer = KafkaProducer(bootstrap_servers=self.bootstrap_servers, value_serializer=value_serializer)
 
     def request_crawl(self, site, timeout=10):
+        log.info(f"Requesting crawl on site '{site}' via topic '{self.topic}'")
         return self.producer.send(self.topic, {'spider': site})
 
     def run_loop(self, interval):
