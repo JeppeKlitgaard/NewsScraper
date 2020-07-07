@@ -1,4 +1,5 @@
 from . import NewsScheduler
+from . import settings
 
 import os
 import sys
@@ -12,6 +13,6 @@ logging.basicConfig(
     ]
 )
 
-scheduler = NewsScheduler(os.environ["NEWS_NET_KAFKA_HOSTS"])
+scheduler = NewsScheduler(os.environ["NEWS_NET_KAFKA_HOSTS"], settings.RSS_FEEDS)
 
-scheduler.run_loop(3)
+scheduler.run_loop(settings.FEED_INTERVAL)

@@ -1,4 +1,10 @@
 scrapy
 itemadapter
+feedparser
 kafka-python
 afkak
+
+confluent-kafka
+requests
+fastavro
+jsonschema
