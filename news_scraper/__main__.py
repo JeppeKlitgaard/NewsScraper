@@ -65,7 +65,7 @@ def consume(reactor, hosts='kafka-server1:9092'):
         """
         deferreds = []
         for m in message_list:
-            log.info("Got message %r", m)
+            log.debug("Got message %r", m)
             mo = json.loads(m.message.value)
             log.info(mo)
             log.info(consumers)
@@ -76,17 +76,21 @@ def consume(reactor, hosts='kafka-server1:9092'):
                 log.error(f"Unable to find spider '{mo['spider']}'. Ignoring error {e}")
                 continue
 
-            d = runner.crawl(spider_obj)
+            d = runner.crawl(spider_obj, rss_item=mo)
             deferreds.append(d)
 
 
         def consumer_commit(r):
-            log.info("Committing to consumer!")
-            
-            d = consumer.commit()
-            d.addCallback(lambda _: log.info("Succesfully commited."))
+            success = all(list(zip(*r))[0])
 
-            start_consumer(consumer)
+            if success:
+                log.info("Committing to consumer!")
+                d = consumer.commit()
+                d.addCallback(lambda _: log.info("Succesfully commited."))
+            
+            else:
+                log.error("A consumer failed. Not committing...")
+
     
         dl = defer.DeferredList(deferreds)
         dl.addBoth(consumer_commit)

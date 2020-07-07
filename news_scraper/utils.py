@@ -13,9 +13,19 @@ def normalise_space(s):
 def filter_empty(lst):
     return [x.strip() for x in lst if x.strip()]
 
+class JSONEncoder(json.JSONEncoder):
+    # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
+    def default(self, obj):
+        # to_json method
+        if hasattr(obj, "to_json"):
+            return self.default(obj.to_json())
+        
+
+        return json.JSONEncoder.default(self, obj)
+
 
 def json_serializer(m):
-    return json.dumps(m).encode('utf-8')
+    return json.dumps(m, cls=JSONEncoder).encode('utf-8')
 
 
 def json_deserializer(x):

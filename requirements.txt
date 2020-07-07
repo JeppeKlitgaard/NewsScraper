@@ -1,6 +1,9 @@
 scrapy
+extruct
 itemadapter
 feedparser
+python-dateutil
+
 kafka-python
 afkak
 

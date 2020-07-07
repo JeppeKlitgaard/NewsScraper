@@ -13,8 +13,19 @@ class NewsScraperItem(scrapy.Item):
 
 
 class Article(scrapy.Item):
-    headline = scrapy.Field()
-    url = scrapy.Field()
-    crawl_datetime = scrapy.Field()
     source = scrapy.Field()
+    source_spider = scrapy.Field()
 
+    headline = scrapy.Field()
+    summary = scrapy.Field()
+    content = scrapy.Field()
+
+    url = scrapy.Field()
+    
+    crawl_datetime = scrapy.Field()
+    published_datetime = scrapy.Field()
+
+    language = scrapy.Field()
+    author = scrapy.Field()
+    article_type = scrapy.Field()  # * See: base.ArticleType
+    
