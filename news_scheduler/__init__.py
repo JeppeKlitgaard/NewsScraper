@@ -24,12 +24,19 @@ def _json_serializer_wrapper(obj, ctx):
 
 class NewsScheduler(object):
     def __init__(self, bootstrap_servers, rss_feeds, topic='crawl-queue',
-                 time_checkpoint_fn='timecheckpoint.txt'):
+                 time_checkpoint_fn_base='scheduler_checkpoint'):
         self.bootstrap_servers = bootstrap_servers
         self.topic = topic
-        self.time_checkpoint = TimeCheckpoint(fn=time_checkpoint_fn)
-
+        
         self.feeds = rss_feeds
+        
+        self.time_checkpoints = dict()
+        for spider_name in self.feeds.values():
+            fn = f'{time_checkpoint_fn_base}_{spider_name}.txt'
+            fn = fn.replace('/', '_')  # we don't want / in our pathnames.
+            self.time_checkpoints[spider_name] = TimeCheckpoint(fn=fn)
+
+
 
         producer_conf = {
             'bootstrap.servers': self.bootstrap_servers,
@@ -38,20 +45,20 @@ class NewsScheduler(object):
         }
         self.producer = SerializingProducer(producer_conf)
 
-    def process_feed(self, feed_url, spider, flush=False):
+    def process_feed(self, feed_url, spider_name, flush=False):
         log.info(f"Processing feed '{feed_url}' via topic '{self.topic}'.")
         rss_feed = feedparser.parse(feed_url)
 
         for item in rss_feed.entries:
-            item['spider'] = spider
-            item_publish_time = struct_time_to_datetime(item.published_parsed)
+            item['spider'] = spider_name
+            item_updated_time = struct_time_to_datetime(item.updated_parsed)
 
-            if item_publish_time > self.time_checkpoint.checkpoint:
+            if item_updated_time > self.time_checkpoints[spider_name].checkpoint:
                 log.info(f"New item: {item['title']}")
 
                 self.producer.produce(topic=self.topic, key=str(uuid4()), value=dict(item))
         
-        self.time_checkpoint.checkpoint = struct_time_to_datetime(rss_feed.feed.published_parsed)
+        self.time_checkpoints[spider_name].checkpoint = struct_time_to_datetime(rss_feed.feed.updated_parsed)
         
         if flush:
             self.producer.flush()
